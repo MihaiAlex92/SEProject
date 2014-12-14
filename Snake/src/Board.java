@@ -1,18 +1,9 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.Timer;
 
 /**
  * Created by Diana on 11-Dec-14.
@@ -24,7 +15,7 @@ public class Board extends JPanel implements ActionListener {
     private final int DOT_SIZE = 10;
     private final int ALL_DOTS = 900;
     private final int RAND_POS = 29;
-    private final int DELAY = 140;
+
 
     private final int x[] = new int[ALL_DOTS];
     private final int y[] = new int[ALL_DOTS];
@@ -32,6 +23,9 @@ public class Board extends JPanel implements ActionListener {
     private int dots;
     private int apple_x;
     private int apple_y;
+    private int score;
+    private int DELAY ;
+
 
     private boolean leftDirection = false;
     private boolean rightDirection = true;
@@ -45,6 +39,9 @@ public class Board extends JPanel implements ActionListener {
     private Image head;
 
     public Board() {
+
+        score =0;
+        DELAY=140;
 
         addKeyListener(new TAdapter());
         setBackground(Color.black);
@@ -93,6 +90,16 @@ public class Board extends JPanel implements ActionListener {
 
         if (inGame) {
 
+            String msg = "Score: "+score;
+            Font small = new Font("Helvetica", Font.BOLD, 14);
+            FontMetrics metr = getFontMetrics(small);
+
+            g.setColor(Color.white);
+            g.setFont(small);
+            g.drawString(msg, (B_WIDTH - metr.stringWidth(msg))/2, B_HEIGHT/12 );
+
+
+
             g.drawImage(apple, apple_x, apple_y, this);
 
             for (int z = 0; z < dots; z++) {
@@ -113,7 +120,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void gameOver(Graphics g) {
 
-        String msg = "Game Over";
+        String msg = "Game Over! Total Score: "+score;
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = getFontMetrics(small);
 
@@ -127,6 +134,11 @@ public class Board extends JPanel implements ActionListener {
         if ((x[0] == apple_x) && (y[0] == apple_y)) {
 
             dots++;
+            score+=10;
+            if(score%50==0 && DELAY>10)
+                DELAY-=10;
+            timer.setDelay(DELAY);
+            // timer.start();
             locateApple();
         }
     }
