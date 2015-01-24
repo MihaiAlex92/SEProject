@@ -1,13 +1,22 @@
 import javax.swing.*;
+import javax.swing.JApplet;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.net.URL;
+import javax.imageio.ImageIO;
+import java.applet.Applet;
+import java.lang.String;
+
+
+
 
 /**
  * Created by Diana on 11-Dec-14.
  */
+
 public class Board extends JPanel implements ActionListener {
 
     private final int B_WIDTH = 300;
@@ -44,7 +53,7 @@ public class Board extends JPanel implements ActionListener {
         DELAY=140;
 
         addKeyListener(new TAdapter());
-        setBackground(Color.black);
+        setBackground(Color.yellow);
         setFocusable(true);
 
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
@@ -54,13 +63,13 @@ public class Board extends JPanel implements ActionListener {
 
     private void loadImages() {
 
-        ImageIcon iid = new ImageIcon("src/dot.png");
-        ball = iid.getImage();
+       ImageIcon iid = new ImageIcon("D:\\Snake\\Snake\\src\\dot.png");
+       ball = iid.getImage();
 
-        ImageIcon iia = new ImageIcon("src/apple2.png");
+        ImageIcon iia = new ImageIcon("D:\\Snake\\Snake\\src\\apple2.png");
         apple = iia.getImage();
 
-        ImageIcon iih = new ImageIcon("src/head.png");
+        ImageIcon iih = new ImageIcon("D:\\Snake\\Snake\\src\\head.png");
         head = iih.getImage();
     }
 
@@ -138,7 +147,7 @@ public class Board extends JPanel implements ActionListener {
             if(score%50==0 && DELAY>10)
                 DELAY-=10;
             timer.setDelay(DELAY);
-            // timer.start();
+           // timer.start();
             locateApple();
         }
     }
@@ -219,6 +228,7 @@ public class Board extends JPanel implements ActionListener {
         repaint();
     }
 
+
     private class TAdapter extends KeyAdapter {
 
         @Override
@@ -253,3 +263,4 @@ public class Board extends JPanel implements ActionListener {
     }
 
 }
+
