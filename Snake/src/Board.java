@@ -71,7 +71,12 @@ public class Board extends JPanel implements ActionListener {
 
         ImageIcon iih = new ImageIcon("D:\\Snake\\Snake\\src\\head.png");
         head = iih.getImage();
+        //iih.setImage();
+
     }
+
+
+
 
     private void initGame() {
 
@@ -97,7 +102,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void doDrawing(Graphics g) {
 
-        if (inGame) {
+        if (inGame && dots<900) {
 
             String msg = "Score: "+score;
             Font small = new Font("Helvetica", Font.BOLD, 14);
@@ -129,13 +134,30 @@ public class Board extends JPanel implements ActionListener {
 
     private void gameOver(Graphics g) {
 
-        String msg = "Game Over! Total Score: "+score;
-        Font small = new Font("Helvetica", Font.BOLD, 14);
-        FontMetrics metr = getFontMetrics(small);
+        if(dots<900)
 
-        g.setColor(Color.white);
-        g.setFont(small);
-        g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+        {
+            String msg = "Game Over! Total Score: " + score;
+            Font small = new Font("Helvetica", Font.BOLD, 14);
+            FontMetrics metr = getFontMetrics(small);
+
+
+            g.setColor(Color.white);
+            g.setFont(small);
+            g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+        }
+        else
+        {
+            String msg = "Game Won!!! Total Score: " + score;
+            Font small = new Font("Helvetica", Font.BOLD, 14);
+            FontMetrics metr = getFontMetrics(small);
+
+
+            g.setColor(Color.white);
+            g.setFont(small);
+            g.drawString(msg, (B_WIDTH - metr.stringWidth(msg)) / 2, B_HEIGHT / 2);
+
+        }
     }
 
     private void checkApple() {
@@ -144,7 +166,7 @@ public class Board extends JPanel implements ActionListener {
 
             dots++;
             score+=10;
-            if(score%50==0 && DELAY>10)
+            if(score%100==0 && DELAY>50)
                 DELAY-=10;
             timer.setDelay(DELAY);
            // timer.start();
@@ -161,18 +183,22 @@ public class Board extends JPanel implements ActionListener {
 
         if (leftDirection) {
             x[0] -= DOT_SIZE;
+
         }
 
         if (rightDirection) {
             x[0] += DOT_SIZE;
+
         }
 
         if (upDirection) {
             y[0] -= DOT_SIZE;
+
         }
 
         if (downDirection) {
             y[0] += DOT_SIZE;
+
         }
     }
 
@@ -206,13 +232,32 @@ public class Board extends JPanel implements ActionListener {
         }
     }
 
+
     private void locateApple() {
 
-        int r = (int) (Math.random() * RAND_POS);
-        apple_x = ((r * DOT_SIZE));
+        boolean badPosition=true;
+        int r;
 
-        r = (int) (Math.random() * RAND_POS);
-        apple_y = ((r * DOT_SIZE));
+        while(badPosition) {
+            int ctr=0;
+            r = (int) (Math.random() * RAND_POS);
+            apple_x = ((r * DOT_SIZE));
+
+            r = (int) (Math.random() * RAND_POS);
+            apple_y = ((r * DOT_SIZE));
+            for(int z=0;z<dots;z++)
+            {
+                if(apple_x!=x[z] || apple_y!=y[z]) {
+                    //badPosition=false;
+                    // break;
+                    ctr++;
+                }
+
+            }
+            if(ctr==dots)
+                badPosition=false;
+        }
+
     }
 
     @Override
@@ -220,9 +265,10 @@ public class Board extends JPanel implements ActionListener {
 
         if (inGame) {
 
+            move();
             checkApple();
             checkCollision();
-            move();
+
         }
 
         repaint();

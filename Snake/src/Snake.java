@@ -41,6 +41,7 @@ public class Snake extends JApplet{
     }
 
     public static void main(String[] args) {
+<<<<<<< HEAD
             EventQueue.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -49,6 +50,20 @@ public class Snake extends JApplet{
                 }
             });
 
+=======
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                //adaugare cadru pentru pronire cu start/highscore/exit
+                //modificare fundal snake+adaugare margini vizibile
+                //adaugare elemente noi pe fundal pe langa mar
+                //ecran final+highscore
+                //adaugare sunete
+                JFrame ex = new Snake();
+                ex.setVisible(true);
+            }
+        });
+>>>>>>> origin/master
     }
 
    /*public static void main(String[] args) {
