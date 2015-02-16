@@ -1,21 +1,22 @@
-package controller;
+package production.snake.controller;
 
-import model.SnakeModel;
+import production.snake.model.SnakeModel;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 /**
-        * MVC Controler responsible for receiving a user's operation, and the user operation notification Model
+ * MVC Controler responsible for receiving a user's operation, and the user operation notification Model
  * /
 
-/**
- * Created by Diana on 14-Feb-15.
+ /**
+ * Created by Diana on 14-Dec-14.
  */
 public class SnakeControl implements KeyListener{
 
     SnakeModel model;
 
-    public SnakeControl (SnakeModel model) {
+    public SnakeControl(SnakeModel model) {
         this.model=model;
     }
 
@@ -36,13 +37,9 @@ public class SnakeControl implements KeyListener{
                     model.changeDirection (SnakeModel.RIGHT);
                     break;
                 case KeyEvent.VK_ADD:
-                case KeyEvent.VK_PAGE_UP:
-                    model.SpeedUp ();
-                    break;
-                case KeyEvent.VK_SUBTRACT:
-                case KeyEvent.VK_PAGE_DOWN:
-                    model.speedDown ();
-                    break;
+                case KeyEvent.VK_R:
+                    model.reset();
+
                 case KeyEvent.VK_SPACE:
                 case KeyEvent.VK_P:
                     model.changePauseState ();
@@ -51,10 +48,10 @@ public class SnakeControl implements KeyListener{
             }
         }
 
-        // Any case processing keys, buttons lead to restart the game
+      /*  // Any case processing keys, buttons lead to restart the game
         if (keyCode == KeyEvent.VK_R ||keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_ENTER) {
             model.reset ();
-        }
+        }*/
     }
 
     public void keyReleased (KeyEvent e) {

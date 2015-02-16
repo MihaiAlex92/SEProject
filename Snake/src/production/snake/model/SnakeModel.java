@@ -1,6 +1,6 @@
-package model;
-import javax.swing. *;
-import  java.util.Arrays;
+package production.snake.model;
+
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Random;
@@ -12,9 +12,11 @@ public class SnakeModel extends Observable implements Runnable {
 
     boolean [] [] matrix; // indication position, there is no snake body or food
 
-   public  LinkedList nodeArray = new LinkedList (); // snake body
+    public  LinkedList nodeArray = new LinkedList (); // snake body
 
-   public  Node food;
+    public  Node food;
+
+    public int speedlevel = 1;
 
     int maxX;
 
@@ -22,17 +24,19 @@ public class SnakeModel extends Observable implements Runnable {
 
     int Direction = 2; // snake running direction
 
-    public boolean running = false; // running state
+    public boolean running = true; // running state
 
-    int timeInterval = 200; // interval, in milliseconds
 
-    double speedChangeRate = 0.75; // every time the speed of the rate of change
+
+    int timeInterval = 140; // interval, in milliseconds
+
+    //  double speedChangeRate = 1.5; // every time the speed of the rate of change
 
     boolean paused = false; // suspend flag
 
     public int score = 0; //Score
 
-     int countMove = 0; // eat the food before the number of mobile
+    //  int countMove = 0; // eat the food before the number of mobile
 
     // UP and DOWN should be even
     // RIGHT and LEFT should be odd
@@ -53,20 +57,23 @@ public class SnakeModel extends Observable implements Runnable {
 
     public void reset () {
         Direction = SnakeModel.UP; // snake running direction
-                timeInterval = 200; // time interval, in milliseconds
-                paused = false; // suspend flag
+        timeInterval = 140; // time interval, in milliseconds
+        paused = false; // suspend flag
+        running=true;
+
         score = 0; // Score
-                countMove = 0; // eat the food before the number of mobile
+        speedlevel=1;
+        // countMove = 0; // eat the food before the number of mobile
 
         // Initial matirx, all cleared
-                matrix = new boolean [maxX] [];
+        matrix = new boolean [maxX] [];
         for (int i = 0; i <maxX; ++i) {
             matrix [i] = new boolean [maxY];
             Arrays.fill (matrix [i], false);
         }
 
         // Initial the snake
-                //Initialize the snake body, if the lateral position of more than 20, the length is 10, otherwise, the lateral position of the half
+        //Initialize the snake body, if the lateral position of more than 20, the length is 10, otherwise, the lateral position of the half
         int initArrayLength = maxX> 20? 10: maxX / 2;
         nodeArray.clear ();
         for (int i = 0; i <initArrayLength; ++i) {
@@ -112,66 +119,68 @@ public class SnakeModel extends Observable implements Runnable {
 
         // If a new coordinate falls within the valid range, then the processing
         if ((0 <= x && x <maxX) && (0 <= y && y <maxY)) {
-            if (matrix [x] [y]) {// if something new coordinates of the point (the snake body or food)
+            if (matrix [x] [y])
+            {    // if something new coordinates of the point (the snake body or food)
                 if (x == food.x && y == food.y) {// eat food successfully
                     nodeArray.addFirst (food); // gift from the snakeheads long
 
-                    // Score rules, with the frequency and speed of the move to change the direction of the two elements
-                    int scoreGet = (10000 - 200 * countMove);  //timeInterval;
-                    score  += scoreGet> 0? scoreGet: 10;
-                    countMove = 0;
+                    score+=10* speedlevel;
+                    if(score%80==0 && timeInterval>50) {
+                        timeInterval -= 10;
+                        speedlevel++;
+                    }
+
+                    //  countMove = 0;
 
                     food = createFood (); // create a new food
                     matrix [food.x] [food.y] = true; // set the location of the food
                     return true;
-                } else
-                        // Eat the the snake body itself, failure
-                return false;
-            } else {// If nothing in the new coordinates of the point (the snake body), move the snake body
+                }
+                else {
+                    // Eat the the snake body itself, failure
+                    return false;
+                }
+
+            } else {// move the snake body
                 nodeArray.addFirst (new Node (x, y));
                 matrix [x] [y] = true;
                 n = (Node) nodeArray.removeLast ();
                 matrix [n.x] [n.y] = false;
-                countMove ++;
+                // countMove ++;
                 return true;
             }
         }
+
         return false; // touch the edges, failure
     }
 
     public void run () {
         running = true;
         while (running) {
+
             try {
                 Thread.sleep (timeInterval);
+
             } catch (Exception e) {
                 break;
             }
 
             if (paused) {
-                if (MoveOn ()) {
+                running=MoveOn();
+                if (running) {
                     setChanged (); // Model has been updated to notify the View data
                     notifyObservers ();
                 } else {
-                    int a = JOptionPane.showConfirmDialog (null,"You are a pig? Please confirm JOptionPane.INFORMATION_MESSAGE");
-                    if (a == 0) {
-                        JOptionPane.showMessageDialog (null,"Haha, you really are a pig Zhu / n continue to go to, continues to be recognized! JOptionPane.WARNING_MESSAGE");
-                        reset();
-                    }
-                    if (a == 1) {
-                        JOptionPane.showMessageDialog (null, "does not recognize even hum ~ ~ ~");
-                        reset();
-                    }
-                    if (a == 2) {
-                    }
 
-                    break;
+                    // the game ends, show highscore?
 
                 }
 
             }
         }
-        running = false;
+
+        // sau aici stergere inserare score?
+
     }
 
     private  Node createFood () {
@@ -184,18 +193,22 @@ public class SnakeModel extends Observable implements Runnable {
             y = r.nextInt (maxY);
         } while (matrix [x] [y]);
 
-        return new Node (x, y);
+        return new Node(x, y);
     }
 
-  public void SpeedUp () {
-        timeInterval *= speedChangeRate;
-    }
+    /* public void SpeedUp () {
+           timeInterval *= speedChangeRate;
+           speedlevel++;
+       }
 
-     public void speedDown () {
-        timeInterval /= speedChangeRate;
-    }
-
-     public void changePauseState () {
+        public void speedDown () {
+           if(speedlevel>1) {
+               timeInterval /= speedChangeRate;
+               speedlevel--;
+           }
+       }
+   */
+    public void changePauseState () {
         paused =! paused;
     }
 

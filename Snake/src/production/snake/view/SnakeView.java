@@ -1,8 +1,8 @@
-package view;
+package production.snake.view;
 
-import controller.SnakeControl;
-import model.SnakeModel;
-import model.Node;
+import production.snake.controller.SnakeControl;
+import production.snake.model.Node;
+import production.snake.model.SnakeModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,12 +11,13 @@ import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
 /**
- * Created by Diana on 15-Feb-15.
+ * Created by Diana on 14-Dec-14.
  */
+
 /**
-        * MVC mode too Viewer, is only responsible for the display of data, without worrying about whether the control logic of the game
+ * MVC mode too Viewer, is only responsible for the display of data, without worrying about whether the control logic of the game
  */
-public class SnakeView  implements Observer{
+public class SnakeView implements Observer{
 
     SnakeControl control = null;
     SnakeModel model = null;
@@ -32,7 +33,7 @@ public class SnakeView  implements Observer{
     public static final int nodeWidth = 10;
     public static final int nodeHeight = 10;
 
-    public SnakeView (SnakeModel model, SnakeControl control) {
+    public SnakeView(SnakeModel model, SnakeControl control) {
         this.model=model;
         this.control = control;
 
@@ -55,16 +56,18 @@ public class SnakeView  implements Observer{
         //Create the help of the under bar
         JPanel panelButtom = new JPanel ();
         panelButtom.setLayout (new BorderLayout ());
-        panelButtom.setBackground (Color.green);
+        panelButtom.setBackground (Color.ORANGE);
 
         JLabel labelHelp;
 
-        labelHelp = new JLabel ("For speed: PageUp + PageDown",JLabel.CENTER);// PageUp, PageDown for Speed
+      /*  labelHelp = new JLabel ("speed: PageUp + PageDown",JLabel.CENTER);// PageUp, PageDown for Speed
                 panelButtom.add (labelHelp, BorderLayout.NORTH);
-        labelHelp = new JLabel ("Start: press ENTER or R or S;", JLabel.CENTER) ;//ENTER or R or S for start
-        panelButtom.add (labelHelp, BorderLayout.CENTER);
-       labelHelp = new JLabel ("Pause: Space or P", JLabel.CENTER) ;//Space or P for pause
+        labelHelp = new JLabel (": ENTER or R or S;", JLabel.CENTER) ;//ENTER or R or S for start
+        panelButtom.add (labelHelp, BorderLayout.CENTER); */
+
+        labelHelp = new JLabel ("Press Space for Start/Pause \n Press R for Reset", JLabel.CENTER) ;//Space or P for pause
         panelButtom.add (labelHelp, BorderLayout.SOUTH);
+
         cp.add (panelButtom, BorderLayout.SOUTH);
 
         mainFrame.addKeyListener (control);
@@ -81,32 +84,49 @@ public class SnakeView  implements Observer{
         g.setColor (Color.WHITE);
         g.fillRect (0, 0, canvasWidth, canvasHeight);
 
-        // Draw the snake
-        g.setColor (Color.black);
-        LinkedList na = model.nodeArray;
-        Iterator it = na.iterator ();
-        Node n;
-        while (it.hasNext ()) {
-          n  = (Node)it.next ();
-            drawNode (g, n);
-        }
+        if(model.running) { // Draw the snake
+            g.setColor(Color.black);
+            LinkedList na = model.nodeArray;
+            Iterator it = na.iterator();
+            Node n;
+            while (it.hasNext()) {
+                n = (Node) it.next();
+                drawNode(g, n);
+            }
 
-        // Draw the food
-        g.setColor (Color.RED);
-         n = model.food;
-        drawNode (g, n);
+            // Draw the food
+            g.setColor(Color.RED);
+            n = model.food;
+            drawNode(g, n);
+        }
+        else
+        {
+            g.setColor(Color.WHITE);
+            LinkedList na = model.nodeArray;
+            Iterator it = na.iterator();
+            Node n;
+            while (it.hasNext()) {
+                n = (Node) it.next();
+                drawNode(g, n);
+            }
+
+            // Draw the food
+            g.setColor(Color.WHITE);
+            n = model.food;
+            drawNode(g, n);
+        }
 
         UpdateScore ();
     }
 
-     private void drawNode (Graphics g, Node n) {
+    private void drawNode (Graphics g, Node n) {
         g.fillRect (n.x * nodeWidth,
                 n.y * nodeHeight,
                 nodeWidth - 1,
                 nodeHeight - 1);
     }
 
-     public void UpdateScore () {
+    public void UpdateScore () {
         String s = "Score:"+ model.score ;// Score
 
         labelScore.setText (s);
