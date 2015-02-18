@@ -1,5 +1,7 @@
 package production.snake.model;
 
+import javax.swing.*;
+import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Observable;
@@ -8,72 +10,55 @@ import java.util.Random;
 /**
  * Created by Diana on 14-Feb-15.
  */
-public class SnakeModel extends Observable implements Runnable {
 
-    boolean [] [] matrix; // indication position, there is no snake body or food
+/**
+ * MVC Model responsabil cu datele jocului si rularea acestuia
+ */
+public class SnakeModel extends Observable implements Runnable { //pentru instanta acestei clase vom folosi un thread
 
-    public  LinkedList nodeArray = new LinkedList (); // snake body
-
+    boolean [] [] matrix; // indica pozitia, daca exista sarpele sau mancarea
+    public  LinkedList nodeArray = new LinkedList (); // corpul sarpelui
     public  Node food;
-
     public int speedlevel = 1;
-
     int maxX;
-
     int maxY;
+    int Direction = 2; // directia de mers a sarpelui , initial merge in sus
+    public boolean running =true; //starea de deplasare
+    int timeInterval = 140; // interval, in ms
+    boolean paused = false; //flag-ul pentru suspendare
+    public int score = 0; //Scor
 
-    int Direction = 2; // snake running direction
-
-    public boolean running = true; // running state
-
-
-
-    int timeInterval = 140; // interval, in milliseconds
-
-    //  double speedChangeRate = 1.5; // every time the speed of the rate of change
-
-    boolean paused = false; // suspend flag
-
-    public int score = 0; //Score
-
-    //  int countMove = 0; // eat the food before the number of mobile
-
-    // UP and DOWN should be even
-    // RIGHT and LEFT should be odd
+    public String hscore=null;
     public static final int UP = 2;
-
     public static final int DOWN = 4;
-
     public static final int LEFT = 1;
-
     public static final int RIGHT = 3;
 
     public SnakeModel (int maxX, int maxY) {
         this.maxX = maxX;
         this.maxY = maxY;
-
         reset ();
     }
 
     public void reset () {
+
         Direction = SnakeModel.UP; // snake running direction
         timeInterval = 140; // time interval, in milliseconds
         paused = false; // suspend flag
         running=true;
-
         score = 0; // Score
         speedlevel=1;
-        // countMove = 0; // eat the food before the number of mobile
-
-        // Initial matirx, all cleared
+        //matricea initiala, toate componentele au valoarea false
         matrix = new boolean [maxX] [];
-        for (int i = 0; i <maxX; ++i) {
+        for (int i = 0; i <maxX; ++i)
+        {
             matrix [i] = new boolean [maxY];
             Arrays.fill (matrix [i], false);
         }
 
-        // Initial the snake
-        //Initialize the snake body, if the lateral position of more than 20, the length is 10, otherwise, the lateral position of the half
+        //Sarpele initial
+        //Initializare corp sarpe, daca pozitia lateral este mai mare de 20, lungimea este 10
+        //altfel 1/2
         int initArrayLength = maxX> 20? 10: maxX / 2;
         nodeArray.clear ();
         for (int i = 0; i <initArrayLength; ++i) {
@@ -83,26 +68,24 @@ public class SnakeModel extends Observable implements Runnable {
             matrix [x] [y] = true;
         }
 
-        // Create food
+        //creare mancare
         food = createFood ();
         matrix [food.x] [food.y] = true;
     }
 
     public void changeDirection (int newDirection) {
-        // Change the direction can not be with the original direction of the same or opposite
+        //schimbam directia, dar nu putem trece de exemplu de la UP direct la DOWN
         if (Direction% 2!= newDirection% 2) {
             Direction = newDirection;
         }
     }
-
-
 
     public boolean MoveOn () {
         Node n = (Node) nodeArray.getFirst ();
         int x = n.x;
         int y = n.y;
 
-        // According to changes in the direction of the coordinate values
+        //schimbarile directiei duc la schimbarea  valorilor coordonatelor
         switch (Direction) {
             case UP:y --;
                 break;
@@ -117,50 +100,42 @@ public class SnakeModel extends Observable implements Runnable {
                 break;
         }
 
-        // If a new coordinate falls within the valid range, then the processing
+        //daca o noua coordonata se afla in  intervalul valid, procesam
         if ((0 <= x && x <maxX) && (0 <= y && y <maxY)) {
-            if (matrix [x] [y])
-            {    // if something new coordinates of the point (the snake body or food)
-                if (x == food.x && y == food.y) {// eat food successfully
-                    nodeArray.addFirst (food); // gift from the snakeheads long
+            if (matrix [x] [y]) {//daca exista ceva :o parte din corpul sarpelui sau mancarea
+                if (x == food.x && y == food.y) { //mananca
+                    nodeArray.addFirst (food); //adauga mancarea
 
-                    score+=10* speedlevel;
-                    if(score%80==0 && timeInterval>50) {
-                        timeInterval -= 10;
+                    //regulile scorului
+                    score  +=10*speedlevel;
+                    if( score%80==0 && timeInterval>50)
+                    {
+                        timeInterval-=10;
                         speedlevel++;
                     }
 
-                    //  countMove = 0;
-
-                    food = createFood (); // create a new food
-                    matrix [food.x] [food.y] = true; // set the location of the food
+                    food = createFood (); //cream mancarea
+                    matrix [food.x] [food.y] = true; // setam locatia mancarii
                     return true;
-                }
-                else {
-                    // Eat the the snake body itself, failure
+                } else
+                    // esec
                     return false;
-                }
-
-            } else {// move the snake body
+            } else { //daca nu exista ceva (corpul sarpelui), sarpele se poate deplasa in continuare
                 nodeArray.addFirst (new Node (x, y));
                 matrix [x] [y] = true;
                 n = (Node) nodeArray.removeLast ();
                 matrix [n.x] [n.y] = false;
-                // countMove ++;
                 return true;
             }
         }
-
-        return false; // touch the edges, failure
+        return false; //a atins marginile
     }
 
     public void run () {
         running = true;
         while (running) {
-
             try {
                 Thread.sleep (timeInterval);
-
             } catch (Exception e) {
                 break;
             }
@@ -168,46 +143,42 @@ public class SnakeModel extends Observable implements Runnable {
             if (paused) {
                 running=MoveOn();
                 if (running) {
-                    setChanged (); // Model has been updated to notify the View data
-                    notifyObservers ();
+                    setChanged (); //modelul a fost updatat, se va notifica View-ul
+                    notifyObservers (); //notificam toti observer-i acestui element
                 } else {
+                    //highscore
+                    Checkscore();
+                    int a=JOptionPane.showConfirmDialog (null,"Play again!","GAME OVER!", JOptionPane.INFORMATION_MESSAGE);
+                    if(a==0) {
+                        JOptionPane.showMessageDialog(null, "Press Space to play!", "Play", JOptionPane.WARNING_MESSAGE);
+                        reset(); //daca s-a apasat OK, jocul se va restarta si trebuie apasata tasta Space pentru a incepe
+                    }
+                    else
+                        System.exit(1);
 
-                    // the game ends, show highscore?
+
 
                 }
 
             }
         }
-
-        // sau aici stergere inserare score?
-
+        // running = false;
+        // sau aici
     }
-
     private  Node createFood () {
         int x = 0;
         int y = 0;
-        // Random access to a valid area do not overlap with the snake body and food
+
+        //creare random a mancarii fara  a se suprapune peste sarpe sau  mancare
         do {
             Random r = new Random ();
             x = r.nextInt(maxX);
             y = r.nextInt (maxY);
         } while (matrix [x] [y]);
 
-        return new Node(x, y);
+        return new Node (x, y);
     }
 
-    /* public void SpeedUp () {
-           timeInterval *= speedChangeRate;
-           speedlevel++;
-       }
-
-        public void speedDown () {
-           if(speedlevel>1) {
-               timeInterval /= speedChangeRate;
-               speedlevel--;
-           }
-       }
-   */
     public void changePauseState () {
         paused =! paused;
     }
@@ -220,5 +191,73 @@ public class SnakeModel extends Observable implements Runnable {
         }
         return result;
     }
+
+
+    public void Checkscore() {
+
+        hscore=getHighScore();
+        if (score > Integer.parseInt(hscore.split(":")[1])) {
+            String name = JOptionPane.showInputDialog("You set a new highscore.Please enter your name:");
+
+            if (name.equals(null)) {
+                name = "Annonimous";
+            }
+            hscore=name + ":" +score;
+            File scoreFile=new File("C:\\highscore.dat");
+            if(!scoreFile.exists())
+                try {
+                    scoreFile.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            FileWriter writeFile=null;
+            BufferedWriter writer=null;
+            try {
+                writeFile=new FileWriter(scoreFile);
+                writer=new BufferedWriter(writeFile);
+                writer.write(hscore);
+
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            finally {
+                try {
+                    if (writer != null)
+                        writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+
+    public String getHighScore() {
+
+        FileReader readFile = null;
+
+
+        BufferedReader reader = null;
+
+        try {
+            readFile = new FileReader("C:\\highscore.dat");
+            reader = new BufferedReader(readFile);
+            return reader.readLine();
+        } catch (Exception e) {
+            return "Nobody:0";
+        } finally {
+            try {
+                if (reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }
 

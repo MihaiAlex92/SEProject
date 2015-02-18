@@ -1,15 +1,14 @@
 package production.snake.model;
 
 /**
- * CCreated by Diana on 14-Dec-14.
+ * Created by Diana on 15-Feb-15.
  */
 public class Node {
 
     public int x;
-
     public int y;
 
-    Node(int x, int y) {
+    Node (int x, int y) {
         this.x = x;
         this.y = y;
     }

@@ -1,8 +1,8 @@
 package production.snake.view;
 
 import production.snake.controller.SnakeControl;
-import production.snake.model.Node;
 import production.snake.model.SnakeModel;
+import production.snake.model.Node;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,12 +12,11 @@ import java.util.Observable;
 import java.util.Observer;
 /**
  * Created by Diana on 14-Dec-14.
- */
-
+        */
 /**
- * MVC mode too Viewer, is only responsible for the display of data, without worrying about whether the control logic of the game
+ * MVC View este responsabil doar cu interfata grafica
  */
-public class SnakeView implements Observer{
+public class SnakeView  implements Observer{  // implementeaza  interfata Observer pentru a fi informat in legatura cu schimbarile unui obiect de tip observable
 
     SnakeControl control = null;
     SnakeModel model = null;
@@ -25,49 +24,40 @@ public class SnakeView implements Observer{
     JFrame mainFrame;
     Canvas paintCanvas;
     JLabel labelScore;
-    JButton hqz;
 
-    public static final int width=300, height=300, canvasWidth = 300 ;// surface version
+    public static final int  canvasWidth = 300 ;// suprafata jocului
     public static final int canvasHeight = 400;
 
     public static final int nodeWidth = 10;
     public static final int nodeHeight = 10;
 
-    public SnakeView(SnakeModel model, SnakeControl control) {
+    public SnakeView (SnakeModel model, SnakeControl control) {
+
         this.model=model;
         this.control = control;
-
         mainFrame = new JFrame ("Snake");
-
         Container cp = mainFrame.getContentPane ();
-
-        //Create the top scores
-
         labelScore = new JLabel ("Score:");
-
         cp.add (labelScore, BorderLayout.NORTH);
 
-        // Create the middle of the game display area
+        // zona jocului din mijloc
         paintCanvas = new Canvas ();
         paintCanvas.setSize (canvasWidth + 1, canvasHeight + 1);
         paintCanvas.addKeyListener (control);
         cp.add (paintCanvas, BorderLayout.CENTER);
 
-        //Create the help of the under bar
+        //zona de help cu instructiuni
         JPanel panelButtom = new JPanel ();
         panelButtom.setLayout (new BorderLayout ());
-        panelButtom.setBackground (Color.ORANGE);
+        panelButtom.setBackground (Color.green);
 
         JLabel labelHelp;
-
-      /*  labelHelp = new JLabel ("speed: PageUp + PageDown",JLabel.CENTER);// PageUp, PageDown for Speed
-                panelButtom.add (labelHelp, BorderLayout.NORTH);
-        labelHelp = new JLabel (": ENTER or R or S;", JLabel.CENTER) ;//ENTER or R or S for start
-        panelButtom.add (labelHelp, BorderLayout.CENTER); */
-
-        labelHelp = new JLabel ("Press Space for Start/Pause \n Press R for Reset", JLabel.CENTER) ;//Space or P for pause
+        labelHelp = new JLabel ("Press Space for Start/Pause!", JLabel.CENTER) ;//Space or P for pause
+        panelButtom.add (labelHelp, BorderLayout.NORTH);
+        labelHelp = new JLabel ("Press P for pause!", JLabel.CENTER) ;
+        panelButtom.add (labelHelp, BorderLayout.CENTER);
+        labelHelp = new JLabel ("Press R for Reset then press Space!", JLabel.CENTER) ;
         panelButtom.add (labelHelp, BorderLayout.SOUTH);
-
         cp.add (panelButtom, BorderLayout.SOUTH);
 
         mainFrame.addKeyListener (control);
@@ -80,59 +70,38 @@ public class SnakeView implements Observer{
     void repaint () {
         Graphics g = paintCanvas.getGraphics ();
 
-        // Draw background
+        // desenam background
         g.setColor (Color.WHITE);
         g.fillRect (0, 0, canvasWidth, canvasHeight);
 
-        if(model.running) { // Draw the snake
-            g.setColor(Color.black);
-            LinkedList na = model.nodeArray;
-            Iterator it = na.iterator();
-            Node n;
-            while (it.hasNext()) {
-                n = (Node) it.next();
-                drawNode(g, n);
-            }
+        // desenam  sarpele
+        g.setColor (Color.black);
+        LinkedList na = model.nodeArray;
+        Iterator it = na.iterator ();
 
-            // Draw the food
-            g.setColor(Color.RED);
-            n = model.food;
-            drawNode(g, n);
-        }
-        else
-        {
-            g.setColor(Color.WHITE);
-            LinkedList na = model.nodeArray;
-            Iterator it = na.iterator();
+        while (it.hasNext ()) {
             Node n;
-            while (it.hasNext()) {
-                n = (Node) it.next();
-                drawNode(g, n);
-            }
-
-            // Draw the food
-            g.setColor(Color.WHITE);
-            n = model.food;
-            drawNode(g, n);
+            n  = (Node)it.next ();
+            drawNode (g, n);
         }
+
+        // desenam mancarea, patratele rosii
+        g.setColor (Color.RED);
+        Node n = model.food;
+        drawNode (g, n);
 
         UpdateScore ();
     }
 
     private void drawNode (Graphics g, Node n) {
-        g.fillRect (n.x * nodeWidth,
-                n.y * nodeHeight,
-                nodeWidth - 1,
-                nodeHeight - 1);
+        g.fillRect (n.x * nodeWidth, n.y * nodeHeight,nodeWidth - 1,nodeHeight - 1);
     }
 
     public void UpdateScore () {
-        String s = "Score:"+ model.score ;// Score
-
+        String s = "Score:"+ model.score +" "+ model.getHighScore() ;
         labelScore.setText (s);
-
     }
-
+    //apelata cand obiectul observat se schimba, SnakeModel extends Observable
     public void update (Observable o, Object arg) {
         repaint ();
     }
